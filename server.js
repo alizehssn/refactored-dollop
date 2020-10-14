@@ -13,15 +13,16 @@ const connection = mysql.createConnection({
     database: "employee_tracker_db"
 });
 
-//Connect to the MySQL server, and call `mainPrompt()` when connected
+//Connect to the MySQL server, and call `mainPrompt()`
+//when connected
 
-// connection.connect(err => {
-//     if (err) {
-//         throw err;
-//     }
-//     runEmployeeTracker();
-// });
-runEmployeeTracker();
+connection.connect(err => {
+    if (err) {
+        throw err;
+    }
+    runEmployeeTracker();
+});
+// runEmployeeTracker();
 
 
 // Runs application with prompts & functions for responses
@@ -35,6 +36,8 @@ function runEmployeeTracker() {
             loop: false,
             choices: [
                     "View All Employees",
+                    "View all Departmens",
+                    "View all Roles",
                     "Search Employee By Department",
                     "Search Employee By Role",
                     "Add New a Employee",
@@ -42,7 +45,10 @@ function runEmployeeTracker() {
                     "Add Employee Role",
                     "Add an Employee's Department",
                     "Add Department",
+                    "Add a New Role",
                     "Update Employee's Role",
+                    "View Employees By Manager",
+                    "View Employees By Department",
                     "Exit"
                 ]
                 //Runs Corresponding Function for Each Choice the User Selects
@@ -51,6 +57,11 @@ function runEmployeeTracker() {
                 case "View All Employees":
                     viewAllEmployees();
                     break;
+                case "View All Departments":
+                    viewDept();
+                    break;
+                case "View All Roles":
+                    viewRoles();
                 case "Search Employee By Department":
                     searchDept();
                     break;
@@ -63,11 +74,20 @@ function runEmployeeTracker() {
                 case "Remove Employee":
                     rmEmployee();
                     break;
+                case "Add a new Role":
+                    addRole();
+                    break;
                 case "Add Department":
                     addDept();
                     break;
                 case "Update Employee's Role":
                     updateRole();
+                    break;
+                case "View Employees By Manager":
+                    viewEmpByMan();
+                    break;
+                case "View Employees By Department":
+                    viewEmpByDept();
                     break;
                 case "Exit":
                 default:
@@ -78,9 +98,7 @@ function runEmployeeTracker() {
         });
 }
 
-
 //Prompt Response Functions:
-
 
 
 //View Departments
@@ -91,6 +109,7 @@ function viewDept() {
             console.log(err);
         const table = cTable.getTable(res);
         console.log(table);
+        runEmployeeTracker();
 
     })
 };
@@ -102,11 +121,13 @@ function viewRoles() {
     connection.query(query, (err, res) => {
         if (err) throw err;
         const table = cTable.getTable(res);
+        console.log(table)
+        runEmployeeTracker
 
     })
 }
 
-//Add Role
+//Add A New Role To Role Table
 
 function addRole() {
     inquirer.prompt([{
@@ -134,6 +155,8 @@ function addRole() {
             };
             connection.query(query, newRole, (err, res) => {
                 if (err) throw err;
+                console.log("New Role Added!");
+                runEmployeeTracker();
             })
         })
 }
@@ -141,7 +164,7 @@ function addRole() {
 
 
 //Dept Functions
-
+//Add to Dept Table
 function addDept() {
     inquirer.prompt([{
                 name: "addDept",
@@ -156,7 +179,7 @@ function addDept() {
             connection.query(query, newDept, (err, res) => {
                 if (err) throw err;
                 console.log("newDept")
-                inquirerMod.prompts();
+                runEmployeeTracker();
             });
 
         });
@@ -185,6 +208,7 @@ function viewAllEmployees() {
             allEmployeesArray.push(employeeInfoArr);
         }
         console.table(allEmployeesArray)
+        runEmployeeTracker();
     })
 
 };
@@ -210,7 +234,7 @@ function addEmployee() {
             {
                 name: "newEmpID",
                 type: "input",
-                message: "What is the new employee's ID(leave blank if the employee is a manager)"
+                message: "What is the new employee's Manager-ID"
             },
 
         ])
@@ -224,6 +248,8 @@ function addEmployee() {
             };
             connection.query(query, newEmp, (err, res) => {
                 if (err) throw err;
+                console.log("New Employee Added Successfully!");
+                runEmployeeTracker();
 
             })
         })
@@ -232,16 +258,18 @@ function addEmployee() {
 //Update employee's role
 function updateRole() {
     inquirer.prompt([{
-            name: "employee",
-            type: "input",
-            message: "Enter the employee's id whose role you would like to update"
-        } {
-            name: "newEmpRole",
-            type: "input",
-            message: "Enter the new Role ID"
-        }, ])
+                name: "employee",
+                type: "input",
+                message: "Enter the employee's id whose role you would like to update"
+            },
+            {
+                name: "newEmpRole",
+                type: "input",
+                message: "Enter the new Role ID"
+            },
+        ])
         .then((data) => {
-            const query = "UPDATE employee SET ? WHERE? ";
+            const query = "UPDATE employee SET ? WHERE ? ";
             const newRole = [{
                     role_id: data.newEmpRole,
                 },
@@ -251,6 +279,8 @@ function updateRole() {
             ];
             connection.query(query, newRole, (err, res) => {
                 if (err) throw err;
+                console.log("New Role Added!");
+                runEmployeeTracker;
 
             })
         })
@@ -269,7 +299,7 @@ function viewEmpByMan() {
         if (err) throw (err);
         const table = cTable.getTable(res);
         console.log(table);
-        inquireMod.prompts();
+        runEmployeeTracker();
     });
 }
 
@@ -282,6 +312,6 @@ function viewEmpByDept() {
     connection.query(query, (err, res) => {
         if (err) throw err;
         const table = cTable.getTable(res);
-
+        runEmployeeTracker()
     })
 }
